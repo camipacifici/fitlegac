@@ -1,8 +1,8 @@
-** Comparing fits to LEGA-C spectra **
+**Comparing fits to LEGA-C spectra**
 
 Using DR3 - May 23, 2019
 
-*by Adam, Anna, Cami, Joel, Sirio
+*by Adam, Anna, Cami, Joel, Sirio*
 
 The list of IDs and data have been circulated by Rachel (email).
 
