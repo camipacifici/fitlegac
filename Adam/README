@@ -1,4 +1,7 @@
-What is in this folder?
+Different runs:
 
-Instructions to read the files.
+phot - Fitting only the photometry with the physical model described in Carnall et al. (2019b) without any calib/noise model.
 
+v1 - Fitting DR3 spectra + photometry with the model described in Carnall et al. (2019b) except for the Gaussian process (second term in Equation 6).
+
+v11 - Fitting DR3 spectra + photometry with the full model described in Carnall et al. (2019b).
