@@ -1,4 +1,59 @@
-What is in this folder?
 
-Instructions to read the files.
+This directory contains the results of Sirio's fits.
 
+The fits were done using Drew Newman's pyspecfit (Newman et al. 2014), following pretty much the methods outlined in Belli, Newman & Ellis (2019). For each galaxy, the LEGA-C spectrum and the broadband photometry are fit simultaneously. Models are from the Bruzual & Charlot 2003 (BC03) library, using a Chabrier IMF, and adopting a Calzetti dust law. Since gas and dust are not modeled, the IRAC data from channel 3 and channel 4 have been excluded from the fit, and the LEGA-C spectrum was masked in the locations corresponding to [OII], [OIII] and Hbeta. The star formation history is a piecewise model with nodes at lookback times of 0.0, 0.35, 0.70, 1.5, 3.0, 6.0 Gyrs. This means that all galaxies started forming 6 Gyr before, independent of their redshift. The file dofit_102266.py shows an example of the code used to set up the fit, and contains more details, e.g., about the prior on each parameter.
+
+The output of the fitting for the whole sample is stored in the single file LEGA-C_fit_sirio.fits. This can be read, e.g. in IDL, with:
+
+IDL> x = mrdfits('LEGA-C_fit_sirio.fits',1)
+
+It's an array of structures, with each structure corresponding to one galaxy:
+
+IDL> help, x[0]
+** Structure <f751a8>, 124 tags, length=425168, data length=425160, refs=2:
+   ID              LONG            172669
+   AGEM_16         DOUBLE       3.2041227e+09
+   AGEM_50         DOUBLE       3.3437965e+09
+   AGEM_84         DOUBLE       3.4651871e+09
+   AGEL_16         DOUBLE       1.6811111e+09
+   AGEL_50         DOUBLE       1.7745437e+09
+   AGEL_84         DOUBLE       1.8650978e+09
+   METAL_16        FLOAT         0.0272887
+   METAL_50        FLOAT         0.0287747
+   METAL_84        FLOAT         0.0301747
+   LMSTAR_16       FLOAT           10.9699
+   LMSTAR_50       FLOAT           10.9873
+   LMSTAR_84       FLOAT           11.0040
+   AV_16           FLOAT        0.00604013
+   AV_50           FLOAT         0.0200498
+   AV_84           FLOAT         0.0404952
+   LAMBDA          FLOAT     Array[6166]
+   BESTFIT         FLOAT     Array[6166]
+   RESIDUALS       FLOAT     Array[6166]
+   USEDPIX         FLOAT     Array[6166]
+   CHI_SPEC        DOUBLE           1.0058614
+   CHI_PHOT        DOUBLE           1.3809379
+   LOOKBACK_TIME   DOUBLE    Array[400]
+   SFH_BESTFIT     DOUBLE    Array[400]
+   SFH_00          DOUBLE    Array[400]
+   SFH_01          DOUBLE    Array[400]
+   SFH_02          DOUBLE    Array[400]
+   SFH_03          DOUBLE    Array[400]
+                    ....
+   SFH_99          DOUBLE    Array[400]
+
+
+For each physical property the 16th, 50th, and 84th percentiles are given. The properties are:
+
+AGEM: mass-weighted age, calculated by integrating SFR(t)*t, where t is the lookback time.
+AGEL: light-weighted age, calculated by integrating F(t)*SFR(t)*t, where F(t) is the flux in the Cousins R band for an SSP with solar metallicity as a function of age t, according to BC03.
+METAL: metallicity, where 0.02 is solar. In my models all stars have the same metallicity
+LMSTAR: log of stellar mass (Msun). It includes dark remnants but not gas returned to the ISM
+AV: dust attenuation in the V band.
+
+Then the LAMBDA, BESTFIT, RESIDUALS are arrays containing the best-fit spectrum and the residuals, with RESIDUALS = DATA - BESTFIT. USEDPIX is a flag: it's 1 for pixels that were included in the fit and zero for pixels that were excluded. Note that the bestfit typically covers a wide range, and a lot of the pixels at the edge are flagged with USEDPIX=0 because there are actually no data there. USEDPIX is set to 0 also in the regions near emission lines.
+
+CHI_SPEC: reduced chi-square for the spectroscopy. This is rescaled before the fitting, so it's almost exactly 1 in all cases.
+CHI_PHOT: reduced chi-square for the photometry. This can be used to identify bad fits. A good rule of thumb is CHI_PHOT > 2 to select problematic fits; there are seven such objects in this sample.
+
+The vectors LOOKBACK_TIME and SFH_BESTFIT contain the SFH, i.e., SFR(t) in units of Msun/yr. Also, 100 draws from the SFH posteriors are stored as SFH_i with i=00...99.
